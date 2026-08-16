@@ -1,0 +1,13 @@
+{
+  "name": "campus-exchange",
+  "version": "1.0.0",
+  "description": "Campus Exchange MERN app",
+  "scripts": {
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
