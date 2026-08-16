@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../api/axios';
 import ItemCard from '../components/ItemCard';
 import { mockItems } from '../data/mockItems';
 import { 
@@ -16,10 +17,9 @@ export default function Home() {
       try {
         setIsLoading(true);
         // The backend sorts by newest automatically
-        const res = await fetch('/api/items');
-        const data = await res.json();
+        const res = await api.get('/items');
         // Limit to 6 items
-        setItems(data.slice(0, 6));
+        setItems(res.data.slice(0, 6));
       } catch (err) {
         console.error('Failed to load items for home page', err);
       } finally {

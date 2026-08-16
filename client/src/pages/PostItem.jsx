@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Info, Camera, Tag, Wallet, User, Send, CheckCircle } from 'lucide-react';
 import CustomSelect from '../components/CustomSelect';
+import api from '../api/axios';
 
 export default function PostItem() {
   const initialFormData = {
@@ -76,24 +77,16 @@ export default function PostItem() {
         imageUrl = await uploadToCloudinary(imageFile);
       }
 
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/items', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` })
-        },
-        body: JSON.stringify({
-          title: formData.title,
-          description: formData.description,
-          category: formData.category || 'other',
-          condition: formData.condition,
-          price: Number(formData.price) || 0,
-          images: imageUrl ? [imageUrl] : [] 
-        })
+      const response = await api.post('/items', {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category || 'other',
+        condition: formData.condition,
+        price: Number(formData.price) || 0,
+        images: imageUrl ? [imageUrl] : [] 
       });
 
-      if (response.ok) {
+      if (response.status === 201 || response.status === 200) {
         setSubmitStatus('success');
         setFormData(initialFormData);
         setImageFile(null);
@@ -101,14 +94,11 @@ export default function PostItem() {
         setTimeout(() => {
           navigate('/my-listings');
         }, 1500);
-      } else {
-        const errData = await response.json().catch(() => ({}));
-        console.error("Backend returned error:", errData);
-        setSubmitStatus(errData.message || 'Failed to post listing. Please try again.');
       }
     } catch (error) {
       console.error(error);
-      setSubmitStatus(error.message || 'Failed to post listing. Please try again.');
+      const errMessage = error.response?.data?.message || error.message || 'Failed to post listing. Please try again.';
+      setSubmitStatus(errMessage);
     } finally {
       setIsSubmitting(false);
     }
