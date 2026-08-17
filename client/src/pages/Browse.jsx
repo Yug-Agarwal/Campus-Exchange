@@ -13,12 +13,14 @@ export default function Browse() {
   
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get('category');
+  const initialSearch = searchParams.get('search');
 
   const initialFilters = {
     category: initialCategory ? [initialCategory] : [],
     condition: [],
     minPrice: '',
-    maxPrice: ''
+    maxPrice: '',
+    search: initialSearch || ''
   };
   const [filters, setFilters] = useState(initialFilters);
 
@@ -31,6 +33,7 @@ export default function Browse() {
       if (currentFilters.condition.length > 0) params.append('condition', currentFilters.condition.join(','));
       if (currentFilters.minPrice) params.append('minPrice', currentFilters.minPrice);
       if (currentFilters.maxPrice) params.append('maxPrice', currentFilters.maxPrice);
+      if (currentFilters.search) params.append('search', currentFilters.search);
 
       const res = await api.get(`/items?${params.toString()}`);
       setItems(res.data);
@@ -88,8 +91,12 @@ export default function Browse() {
             </div>
             <input 
               type="text" 
+              name="search"
+              value={filters.search}
+              onChange={handleInputChange}
+              onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
               className="block w-full pl-11 pr-4 py-3.5 bg-surface border border-border rounded-xl text-text focus:outline-none focus:ring-2 focus:ring-indigo transition-shadow"
-              placeholder="Search laptops, cycles, furniture..."
+              placeholder="Search laptops, cycles, furniture... (Press enter to search)"
             />
           </div>
           <button className="flex items-center justify-center gap-2 px-6 py-3.5 bg-surface border border-border rounded-xl text-text font-medium hover:bg-bg-secondary transition-colors shadow-sm">

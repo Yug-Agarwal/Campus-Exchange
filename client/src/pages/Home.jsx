@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import ItemCard from '../components/ItemCard';
 import { mockItems } from '../data/mockItems';
@@ -11,6 +11,8 @@ import {
 export default function Home() {
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -28,6 +30,15 @@ export default function Home() {
     };
     fetchItems();
   }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/browse?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/browse');
+    }
+  };
 
   const categories = [
     { name: 'Books', value: 'book', icon: Book, color: 'text-indigo' },
@@ -60,19 +71,21 @@ export default function Home() {
             Seniors sell, juniors save. Books, gadgets, cycles and more - all inside NIT Hamirpur with verified sellers, fair prices and zero hassle.
           </p>
           
-          <div className="w-full relative mt-2 shadow-sm">
+          <form onSubmit={handleSearch} className="w-full relative mt-2 shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
             </div>
             <input 
               type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="block w-full pl-11 pr-24 py-4 bg-surface border border-border rounded-full text-text focus:outline-none focus:ring-2 focus:ring-indigo transition-shadow"
               placeholder="Search books, cycles, gadgets..."
             />
-            <button className="absolute inset-y-1.5 right-1.5 bg-coral hover:bg-coral-hover text-white font-medium px-5 rounded-full transition-colors">
+            <button type="submit" className="absolute inset-y-1.5 right-1.5 bg-coral hover:bg-coral-hover text-white font-medium px-5 rounded-full transition-colors">
               Search
             </button>
-          </div>
+          </form>
           
           <div className="flex flex-wrap items-center gap-4 mt-2">
             <Link to="/browse" className="bg-coral hover:bg-coral-hover text-white font-medium px-6 py-3 rounded-lg transition-colors shadow-sm">
